@@ -124,22 +124,22 @@ button:hover {
     color: red;
     text-align: center;
 }
-.menu-button {
+.menu-button a {
     position: absolute;
     top: 10px;
     right: 10px;
 }
-
-.menu-button button {
-    background-color: #007bff;
+.menu-button a {
+    background-color: #ffcc00;
     color: white;
     border: none;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
     border-radius: 5px;
+    text-decoration: none; /* Para quitar el subrayado del enlace */
 }
 
-.menu-button button:hover {
-    background-color: #0056b3;
+.menu-button a:hover {
+    background-color: #e6b800; /* Cambia el color de hover si lo deseas */
 }
