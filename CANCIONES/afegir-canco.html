@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afegir Cançó</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="menu-button">
+        <button onclick="history.back();">TORNAR</button> 
+    </div>
+
+    <div class="container">
+        <div class="title">
+            <h1>Afegir Cançó</h1>
+        </div>
+</body>
+
+
+        <form id="canço" action="/PHP/canciones.php" method="POST" enctype="multipart/form-data">
+            <label for="titol">Títol:</label>
+            <input type="text" id="titol" name="titol" required>
+
+            <label for="artista">artista:</label>
+            <input type="text" id="artista" name="artista" required>
+
+            <label for="musica">Fitxer de música:</label>
+            <input type="file" id="musica" name="musica" accept=".mp3,.json" required>
+
+            <label for="cover">Fitxer de caràtula:</label>
+            <input type="file" id="cover" name="cover" accept="image/*" required>
+
+            <label for="joc">Fitxer de joc (TXT):</label>
+            <input type="file" id="joc" name="joc" accept=".txt">
+
+            <label for="textarea">Crea tu mateix el fitxer de joc:</label>
+            <textarea name="textarea" id="textarea" rows="4" cols="50" placeholder="Escriu el teu fitxer de joc..."></textarea>
+
+            <button type="submit">Afegir Cançó</button>
+        </form>
+        <div id="message">
+    </div>
+</body>
+</html>

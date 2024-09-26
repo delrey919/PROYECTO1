@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalitzar Cançó</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css"> 
+</head>
+<body>
+    <div class="menu-button">
+        <button onclick="history.back();">TORNAR</button> 
+    </div>   
+    <div class="container">
+        <div class="title">
+            <h1>Personalitzar Cançó</h1>
+        </div>
+
+        <div class="content">
+            <form id="songForm" action="upload.php" method="POST" enctype="multipart/form-data">
+                <label for="title">Títol:</label>
+                <input type="text" name="title" required>
+    
+                <label for="artist">Artista:</label>
+                <input type="text" name="artist" required>
+    
+                <label for="musicFile">Fitxer de música:</label>
+                <input type="file" name="musicFile" accept=".mp3,.wav" required>
+    
+                <label for="coverFile">Fitxer de caràtula:</label>
+                <input type="file" name="coverFile" accept="image/*" required>
+    
+                <label for="gameFile">Fitxer de joc (TXT):</label>
+                <input type="file"S name="gameFile" accept=".txt">
+    
+                <label for="gameData">Crea tu mateix el fitxer de joc:</label>
+                <textarea name="gameData" placeholder="Escriu aquí el fitxer de joc..."></textarea>
+    
+                <button type="submit">Personalitzar Cançó</button>
+        </div>
+    </div>
+</body>
+</html>
