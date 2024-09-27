@@ -17,26 +17,23 @@
             <h1>Afegir Cançó</h1>
         </div>
 </body>
+    
 
-
-        <form id="canço" action="/PHP/canciones.php" method="POST" enctype="multipart/form-data">
+        <form id="canço" action="/PHP/cancion.php" method="POST" enctype="multipart/form-data">
             <label for="titol">Títol:</label>
             <input type="text" id="titol" name="titol" required>
 
             <label for="artista">artista:</label>
             <input type="text" id="artista" name="artista" required>
 
-            <label for="musica">Fitxer de música:</label>
-            <input type="file" id="musica" name="musica" accept=".mp3,.json" required>
+            <label for="audio">Fitxer de música:</label>
+            <input type="file" id="audio" name="audio" accept=".mp3,.json" required>
 
-            <label for="cover">Fitxer de caràtula:</label>
-            <input type="file" id="cover" name="cover" accept="image/*" required>
+            <label for="portada">Fitxer de caràtula:</label>
+            <input type="file" id="portada" name="portada" accept="image/*" required>
 
-            <label for="joc">Fitxer de joc (TXT):</label>
-            <input type="file" id="joc" name="joc" accept=".txt">
-
-            <label for="textarea">Crea tu mateix el fitxer de joc:</label>
-            <textarea name="textarea" id="textarea" rows="4" cols="50" placeholder="Escriu el teu fitxer de joc..."></textarea>
+            <label for="arxiu">Fitxer de joc (TXT):</label>
+            <input type="file" id="arxiu" name="arxiu" accept=".txt">
 
             <button type="submit">Afegir Cançó</button>
         </form>

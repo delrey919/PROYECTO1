@@ -131,7 +131,7 @@ button:hover {
 }
 .menu-button a {
     background-color: #ffcc00;
-    color: white;
+    color: rgb(0, 0, 0);
     border: none;
     padding: 10px 20px;
     font-size: 16px;
