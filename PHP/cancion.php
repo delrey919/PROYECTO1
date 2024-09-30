@@ -4,94 +4,89 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Directoris per emmagatzemar els arxius
-    $audioDir = "./CANCIONES";
-    $portadaDir = "./CANCIONES";
-    $archivoDir = "./CANCIONES";
+    // Rutas absolutas para almacenar los archivos
+    $audioDir = "C:/xampp/htdocs/PROYECTO 1/CANCIONES/";
+    $portadaDir = "C:/xampp/htdocs/PROYECTO 1/CANCIONES/";
+    $archivoDir = "C:/xampp/htdocs/PROYECTO 1/CANCIONES/";
 
-    // Recollim les dades del formulari
-    $titol = $_POST['titol'];
-    $artista = $_POST['artista'];
+    // Recogemos los datos del formulario
+    $titulo = $_POST['titol'];
+    $autor = $_POST['artista'];
 
-    // Guardem els arxius pujats amb verificacions
+    // Guardamos los archivos subidos con verificaciones
     $audioPath = $audioDir . basename($_FILES["audio"]["name"]);
     $portadaPath = $portadaDir . basename($_FILES["portada"]["name"]);
     $archivoPath = $archivoDir . basename($_FILES["arxiu"]["name"]);
 
-    $errors = []; // Array per emmagatzemar errors
+    $errores = []; // Array para almacenar errores
 
+    // Subir archivo de audio
     if (is_uploaded_file($_FILES['audio']['tmp_name'])) {
         if (!move_uploaded_file($_FILES["audio"]["tmp_name"], $audioPath)) {
-            $errors[] = "Error pujant l'arxiu d'àudio.";
+            $errores[] = "Error subiendo el archivo de audio.";
         }
     } else {
-        $errors[] = "No s'ha pujat cap arxiu d'àudio.";
+        $errores[] = "No se ha subido ningún archivo de audio.";
     }
 
+    // Subir archivo de portada
     if (is_uploaded_file($_FILES['portada']['tmp_name'])) {
         if (!move_uploaded_file($_FILES["portada"]["tmp_name"], $portadaPath)) {
-            $errors[] = "Error pujant l'arxiu de caràtula.";
+            $errores[] = "Error subiendo el archivo de portada.";
         }
     } else {
-        $errors[] = "No s'ha pujat cap arxiu de caràtula.";
+        $errores[] = "No se ha subido ningún archivo de portada.";
     }
 
-    if (is_uploaded_file($_FILES['arxiu']['tmp_name'])) {
+    // Subir archivo de juego
+    if (isset($_FILES['arxiu']) && is_uploaded_file($_FILES['arxiu']['tmp_name'])) {
         if (!move_uploaded_file($_FILES["arxiu"]["tmp_name"], $archivoPath)) {
-            $errors[] = "Error pujant l'arxiu de joc.";
-        }
-    } else {
-        $errors[] = "No s'ha pujat cap arxiu de joc.";
-    }
-
-    // Verifiquem si s'ha escrit el fitxer de joc manualment (textarea)
-    if (!empty($_POST['textarea'])) {
-        $customFileContent = $_POST['textarea'];
-        $archivoPath = $archivoDir . "/fitxer_manual.txt";
-        if (file_put_contents($archivoPath, $customFileContent) === false) {
-            $errors[] = "Error guardant l'arxiu de joc creat manualment.";
+            $errores[] = "Error subiendo el archivo de juego.";
         }
     }
 
-    // Verifiquem l'arxiu JSON
-    $jsonFile = './PHP/canciones.json';
+    // Verificamos el archivo JSON
+    $jsonFile = 'canciones.json';
     if (file_exists($jsonFile)) {
         $jsonData = file_get_contents($jsonFile);
         $data = json_decode($jsonData, true);
         if ($data === null) {
-            $errors[] = "Error al desxifrar JSON: " . json_last_error_msg();
+            $errores[] = "Error al decodificar JSON: " . json_last_error_msg();
+        } elseif (!isset($data['Canciones'])) {
+            $data['Canciones'] = []; // Asegúrate de que 'Canciones' sea un array
         }
     } else {
-        $errors[] = "L'arxiu JSON no existeix.";
+        $errores[] = "El archivo JSON no existe.";
+        $data = ['Canciones' => []]; // Inicializa 'Canciones' como un array vacío
     }
 
-    // Si no hi ha errors, afegim la nova cançó
-    if (empty($errors)) {
-        $novaCançó = array(
-            "titol" => $titol,
-            "artista" => $artista,
+    // Si no hay errores, añadimos la nueva canción
+    if (empty($errores)) {
+        $nuevaCancion = array(
+            "titulo" => $titulo,
+            "autor" => $autor,
             "audio" => $audioPath,
             "portada" => $portadaPath,
-            "arxiu" => $archivoPath
+            "archivo" => $archivoPath
         );
 
-        // Afegim la nova cançó a l'array existent
-        array_push($data["Cancions"], $novaCançó);
+        // Añadimos la nueva canción al array existente
+        array_push($data["Canciones"], $nuevaCancion);
 
-        // Guardem de nou les dades a app.json
+        // Guardamos de nuevo los datos en canciones.json
         $jsonData = json_encode($data, JSON_PRETTY_PRINT);
         if (file_put_contents($jsonFile, $jsonData) === false) {
-            $errors[] = "Error guardant l'arxiu JSON.";
+            $errores[] = "Error guardando el archivo JSON.";
         } else {
-            // Redirigim a "correcte.html" si tot està bé
-            header("Location: correcte.html");
+            // Redirigimos a "correcto.html" si todo está bien
+            header("Location: ../subida.html");
             exit();
         }
     }
 
-    // Si hi ha errors, els mostrem
-    if (!empty($errors)) {
-        foreach ($errors as $error) {
+    // Si hay errores, los mostramos
+    if (!empty($errores)) {
+        foreach ($errores as $error) {
             echo $error . "<br>";
         }
     }
