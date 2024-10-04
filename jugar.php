@@ -14,6 +14,9 @@
     <div class="container">
         <div class="title">
             <h1>JUGAR</h1>
+            <?php include 'PHP/carrusel.php'; ?>
+
+
  
     </div>
 
@@ -21,5 +24,7 @@
             <p>Escull una cançó</p>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

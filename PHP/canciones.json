@@ -1,6 +1,12 @@
 {
     "Canciones": [
+        [],
         {
+            "titulo": "beti",
+            "autor": "beti",
+            "audio": "C:\/xampp\/htdocs\/PROYECTO 1\/CANCIONES\/tomp3.cc - Himno de Real Betis.mp3",
+            "portada": "C:\/xampp\/htdocs\/PROYECTO 1\/CANCIONES\/hogwarts-legacy-11563.webp",
+            "archivo": "C:\/xampp\/htdocs\/PROYECTO 1\/CANCIONES\/github-recovery-codes (1).txt"
         }
     ]
 }
