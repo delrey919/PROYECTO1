@@ -124,11 +124,13 @@ button:hover {
     color: red;
     text-align: center;
 }
+
 .menu-button a {
     position: absolute;
     top: 10px;
     right: 10px;
 }
+
 .menu-button a {
     background-color: #ffcc00;
     color: rgb(0, 0, 0);
@@ -143,3 +145,4 @@ button:hover {
 .menu-button a:hover {
     background-color: #e6b800; /* Cambia el color de hover si lo deseas */
 }
+

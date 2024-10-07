@@ -1,67 +1,38 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Rutas absolutas para almacenar los archivos
-    $audioDir = "C:/xampp/htdocs/PROYECTO 1/CANCIONES/";
-    $portadaDir = "C:/xampp/htdocs/PROYECTO 1/CANCIONES/";
-    $archivoDir = "C:/xampp/htdocs/PROYECTO 1/CANCIONES/";
+    $dir = "./CANCIONES/";
 
-    // Recogemos los datos del formulario
+    // Usamos 'titol' y 'artista' de acuerdo a los nombres en el HTML
     $titulo = $_POST['titol'];
     $autor = $_POST['artista'];
 
-    // Guardamos los archivos subidos con verificaciones
-    $audioPath = $audioDir . basename($_FILES["audio"]["name"]);
-    $portadaPath = $portadaDir . basename($_FILES["portada"]["name"]);
-    $archivoPath = $archivoDir . basename($_FILES["arxiu"]["name"]);
+    // Generamos rutas únicas para los archivos
+    $audioPath = $dir . uniqid() . "_" . basename($_FILES["audio"]["name"]);
+    $portadaPath = $dir . uniqid() . "_" . basename($_FILES["portada"]["name"]);
+    $archivoPath = $dir . uniqid() . "_" . basename($_FILES["arxiu"]["name"]);
 
-    $errores = []; // Array para almacenar errores
+    // Intentamos mover los archivos subidos
+    if (
+        move_uploaded_file($_FILES["audio"]["tmp_name"], $audioPath) &&
+        move_uploaded_file($_FILES["portada"]["tmp_name"], $portadaPath) &&
+        move_uploaded_file($_FILES["arxiu"]["tmp_name"], $archivoPath)
+    ) {
+        // Agrega depuración aquí para verificar las rutas
+        echo "Audio: $audioPath<br>";
+        echo "Portada: $portadaPath<br>";
+        echo "Archivo: $archivoPath<br>";
 
-    // Subir archivo de audio
-    if (is_uploaded_file($_FILES['audio']['tmp_name'])) {
-        if (!move_uploaded_file($_FILES["audio"]["tmp_name"], $audioPath)) {
-            $errores[] = "Error subiendo el archivo de audio.";
+        // Cargar el archivo JSON
+        $jsonFile = './canciones.json';
+        // Verifica si el archivo existe y está en el formato correcto
+        if (file_exists($jsonFile)) {
+            $data = json_decode(file_get_contents($jsonFile), true);
+        } else {
+            // Si no existe, inicializa la estructura del JSON
+            $data = ["Canciones" => []];
         }
-    } else {
-        $errores[] = "No se ha subido ningún archivo de audio.";
-    }
 
-    // Subir archivo de portada
-    if (is_uploaded_file($_FILES['portada']['tmp_name'])) {
-        if (!move_uploaded_file($_FILES["portada"]["tmp_name"], $portadaPath)) {
-            $errores[] = "Error subiendo el archivo de portada.";
-        }
-    } else {
-        $errores[] = "No se ha subido ningún archivo de portada.";
-    }
-
-    // Subir archivo de juego
-    if (isset($_FILES['arxiu']) && is_uploaded_file($_FILES['arxiu']['tmp_name'])) {
-        if (!move_uploaded_file($_FILES["arxiu"]["tmp_name"], $archivoPath)) {
-            $errores[] = "Error subiendo el archivo de juego.";
-        }
-    }
-
-    // Verificamos el archivo JSON
-    $jsonFile = 'canciones.json';
-    if (file_exists($jsonFile)) {
-        $jsonData = file_get_contents($jsonFile);
-        $data = json_decode($jsonData, true);
-        if ($data === null) {
-            $errores[] = "Error al decodificar JSON: " . json_last_error_msg();
-        } elseif (!isset($data['Canciones'])) {
-            $data['Canciones'] = []; // Asegúrate de que 'Canciones' sea un array
-        }
-    } else {
-        $errores[] = "El archivo JSON no existe.";
-        $data = ['Canciones' => []]; // Inicializa 'Canciones' como un array vacío
-    }
-
-    // Si no hay errores, añadimos la nueva canción
-    if (empty($errores)) {
+        // Creamos una nueva canción
         $nuevaCancion = array(
             "titulo" => $titulo,
             "autor" => $autor,
@@ -70,25 +41,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             "archivo" => $archivoPath
         );
 
-        // Añadimos la nueva canción al array existente
+        // Añadimos la nueva canción al array
         array_push($data["Canciones"], $nuevaCancion);
 
-        // Guardamos de nuevo los datos en canciones.json
-        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        if (file_put_contents($jsonFile, $jsonData) === false) {
-            $errores[] = "Error guardando el archivo JSON.";
-        } else {
-            // Redirigimos a "correcto.html" si todo está bien
-            header("Location: ../subida.html");
-            exit();
-        }
-    }
+        // Guardamos los cambios en el archivo JSON
+        file_put_contents($jsonFile, json_encode($data, JSON_PRETTY_PRINT));
 
-    // Si hay errores, los mostramos
-    if (!empty($errores)) {
-        foreach ($errores as $error) {
-            echo $error . "<br>";
-        }
+        // Redirigimos a la página de confirmación
+        header("Location: ../subida.html");
+        exit();
+    } else {
+        // Mensaje de error si no se pueden mover los archivos
+        echo "Error subiendo los archivos. Asegúrate de que los archivos existen y que tienen los permisos correctos.";
     }
 }
 ?>

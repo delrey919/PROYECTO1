@@ -1,12 +1,25 @@
 {
     "Canciones": [
-        [],
         {
             "titulo": "beti",
             "autor": "beti",
-            "audio": "C:\/xampp\/htdocs\/PROYECTO 1\/CANCIONES\/tomp3.cc - Himno de Real Betis.mp3",
-            "portada": "C:\/xampp\/htdocs\/PROYECTO 1\/CANCIONES\/hogwarts-legacy-11563.webp",
-            "archivo": "C:\/xampp\/htdocs\/PROYECTO 1\/CANCIONES\/github-recovery-codes (1).txt"
+            "audio": ".\/CANCIONES\/670005b3d337a_tomp3.cc - Himno de Real Betis.mp3",
+            "portada": ".\/CANCIONES\/670005b3d3380_hogwarts-legacy-11563.webp",
+            "archivo": ".\/CANCIONES\/670005b3d3381_github-recovery-codes (1).txt"
+        },
+        {
+            "titulo": "beti",
+            "autor": "beti",
+            "audio": ".\/CANCIONES\/6703e5c7d7f12_tomp3.cc - Himno de Real Betis.mp3",
+            "portada": ".\/CANCIONES\/6703e5c7d7f22_hogwarts-legacy-11563.webp",
+            "archivo": ".\/CANCIONES\/6703e5c7d7f24_github-recovery-codes (1).txt"
+        },
+        {
+            "titulo": "fds",
+            "autor": "4343",
+            "audio": ".\/CANCIONES\/6703eb9eb3141_tomp3.cc - Himno de Real Betis.mp3",
+            "portada": ".\/CANCIONES\/6703eb9eb3152_nazare-portugal-europe (1) (1).jpg",
+            "archivo": ".\/CANCIONES\/6703eb9eb3155_github-recovery-codes.txt"
         }
     ]
 }
