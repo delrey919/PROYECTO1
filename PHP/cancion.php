@@ -1,6 +1,7 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $dir = "./CANCIONES/";
+    // Cambiar la ruta a la carpeta CANCIONES desde la carpeta PHP
+    $dir = "../CANCIONES/";
 
     // Usamos 'titol' y 'artista' de acuerdo a los nombres en el HTML
     $titulo = $_POST['titol'];
@@ -23,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Archivo: $archivoPath<br>";
 
         // Cargar el archivo JSON
-        $jsonFile = './canciones.json';
+        $jsonFile = 'canciones.json'; // Ruta para cargar el archivo JSON
         // Verifica si el archivo existe y está en el formato correcto
         if (file_exists($jsonFile)) {
             $data = json_decode(file_get_contents($jsonFile), true);
@@ -36,9 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $nuevaCancion = array(
             "titulo" => $titulo,
             "autor" => $autor,
-            "audio" => $audioPath,
-            "portada" => $portadaPath,
-            "archivo" => $archivoPath
+            "audio" => './CANCIONES/' . basename($audioPath), // Ruta relativa al archivo de audio
+            "portada" => './CANCIONES/' . basename($portadaPath), // Ruta relativa a la portada
+            "archivo" => './CANCIONES/' . basename($archivoPath)  // Ruta relativa al archivo
         );
 
         // Añadimos la nueva canción al array
@@ -51,8 +52,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: ../subida.html");
         exit();
     } else {
-        // Mensaje de error si no se pueden mover los archivos
-        echo "Error subiendo los archivos. Asegúrate de que los archivos existen y que tienen los permisos correctos.";
+        // Manejo de error en caso de que no se puedan mover los archivos
+        echo "Error al subir los archivos. Verifica los permisos y el tamaño de los archivos.";
     }
 }
 ?>
