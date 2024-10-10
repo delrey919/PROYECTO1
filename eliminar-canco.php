@@ -23,19 +23,51 @@
             flex-grow: 1;
         }
 
-        .delete-button {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: 20px;
-        }
+    .delete-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-left: 10px;
+    }
 
-        .delete-button:hover {
-            background-color: #ff1a1a;
-        }
+    .delete-button:hover {
+        background-color: #ff1a1a;
+    }
+    .song-details {
+    flex-grow: 1;
+    min-width: 300px;
+}
+
+.song-details h5 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffda44;
+}
+
+.song-details p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    margin: 5px 0 0;
+    color: #ffffff;
+}
+
+
+.song-item { 
+    padding: 15px;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.song-item:hover {
+    transform: scale(1.05); 
+}
+
     </style>
 </head>
 <body>
@@ -85,7 +117,7 @@
 
                         <div class="song-details">
                             <h5><?php echo htmlspecialchars($cancion['titulo'] ?? 'Título no disponible'); ?></h5>
-                            <p>Autor: <?php echo htmlspecialchars($cancion['autor'] ?? 'Autor no disponible'); ?></p>
+                            <p><?php echo htmlspecialchars($cancion['autor'] ?? 'Autor no disponible'); ?></p>
                         </div>
                         <button type="submit" name="titulo" value="<?php echo htmlspecialchars($cancion['titulo'] ?? ''); ?>" class="delete-button">Eliminar</button>
                     </div>
