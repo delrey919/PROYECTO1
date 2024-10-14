@@ -3,30 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interaccions de Tecles</title>
+    <title>Simulador de Flechas</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
+            background-color: #282c34;
+            color: #ffcc00;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #282c34;
-            color: #ffcc00;
-            flex-direction: column;
+            margin: 0;
         }
+
+        .contenedor-juego {
+            width: 300px;
+            height: 500px;
+            background-color: #333;
+            border: 3px solid #ffcc00;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .flecha {
+            font-size: 50px;
+            position: absolute;
+            top: -50px;
+            color: #ffcc00;
+            text-align: center;
+            width: 50px;
+        }
+
+        .zona-objetivo {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            height: 50px;
+            border-top: 3px solid #ffcc00;
+        }
+
+        .barra-progreso {
+            width: 100%;
+            height: 10px;
+            background-color: #555;
+            border-radius: 5px;
+            overflow: hidden;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+
+        .progreso {
+            height: 100%;
+            background-color: #ffcc00;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
 
         .feedback {
-            font-size: 2rem;
-            margin-top: 20px;
+            font-size: 1.5rem;
+            margin-top: 10px;
         }
 
-        .tecla {
-            font-size: 100px;
-            margin: 20px;
+
+        .puntuacion {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            font-weight: bold;
         }
+
 
         .correcte {
             color: #00ff00;
@@ -38,24 +90,44 @@
     </style>
 </head>
 <body>
-    <div class="tecla">-</div>
+    <div class="contenedor-juego">
+        <div class="zona-objetivo"></div>
+    </div>
+
+    <div class="puntuacion">Puntuació: 0</div> 
     <div class="feedback"></div>
+
+    <div class="barra-progreso">
+        <div class="progreso"></div>
+    </div>
+
+    <audio id="audioCancion"></audio>
 
     <script>
         let interacciones = [];
         let currentInteractionIndex = 0;
         let timer;
-
-        const teclaElement = document.querySelector('.tecla');
+        let puntos = 0;
+        let puedePresionar = true;
+        let duracionCancion = 0;
+        const contenedorJuego = document.querySelector('.contenedor-juego');
         const feedbackElement = document.querySelector('.feedback');
+        const puntuacionElement = document.querySelector('.puntuacion');
+        const zonaObjetivo = document.querySelector('.zona-objetivo');
+        const barraProgreso = document.querySelector('.progreso');
+        const audioCancion = document.getElementById("audioCancion");
 
         // Función para leer el archivo JSON
         function leerCancion() {
             fetch('PHP/canciones.json')
                 .then(response => response.json())
                 .then(data => {
-                    // Obtener el archivo txt de la primera canción
                     const archivoTxt = data.Canciones[0].archivo;
+                    audioCancion.src = data.Canciones[0].audio;
+                    audioCancion.play();
+                    audioCancion.onloadedmetadata = function() {
+                        duracionCancion = audioCancion.duration;
+                    };
                     leerArchivoTeclas(archivoTxt);
                 })
                 .catch(error => {
@@ -69,10 +141,10 @@
             fetch(rutaTxt)
                 .then(response => response.text())
                 .then(data => {
-                    // Procesar el archivo .txt línea por línea
                     interacciones = procesarInteracciones(data);
                     if (interacciones.length > 0) {
                         iniciarInteracciones();
+                        iniciarBarraProgreso();  // Iniciar la barra de progreso
                     } else {
                         feedbackElement.textContent = "No hi ha interaccions disponibles.";
                     }
@@ -88,7 +160,6 @@
             const lineas = contenidoTxt.split('\n');
             let interaccionesProcesadas = [];
 
-            // Ignorar la primera línea (que es el número '12')
             for (let i = 1; i < lineas.length; i++) {
                 const linea = lineas[i].trim();
                 if (linea) {
@@ -104,50 +175,83 @@
             return interaccionesProcesadas;
         }
 
-        // Función para iniciar el ciclo de interacciones
+        // Función para iniciar las interacciones
         function iniciarInteracciones() {
             if (currentInteractionIndex < interacciones.length) {
                 const interaccion = interacciones[currentInteractionIndex];
-                mostrarTecla(interaccion.tecla);
-
-                // Mostrar la tecla por el tiempo definido (inicio -> fin)
-                timer = setTimeout(() => {
-                    ocultarTecla();
-                    currentInteractionIndex++;
-                    iniciarInteracciones();  // Llamada recursiva para pasar a la siguiente interacción
-                }, (interaccion.fin - interaccion.inicio) * 1000);
+                crearFlecha(interaccion.tecla, interaccion.inicio, interaccion.fin);
+                currentInteractionIndex++;
+                setTimeout(iniciarInteracciones, (interaccion.fin - interaccion.inicio) * 1000);
             } else {
                 feedbackElement.textContent = "Interaccions finalitzades.";
+                audioCancion.pause();
             }
         }
 
-        // Mostrar tecla en pantalla
-        function mostrarTecla(teclaUnicode) {
-            teclaElement.textContent = String.fromCharCode(teclaUnicode);
-            feedbackElement.textContent = "";
+        // Crear y mover la flecha
+        function crearFlecha(teclaUnicode, inicio, fin) {
+            const flechaElement = document.createElement('div');
+            const flechas = { 37: "←", 38: "↑", 39: "→", 40: "↓" };
+            flechaElement.textContent = flechas[teclaUnicode] || String.fromCharCode(teclaUnicode);
+            flechaElement.classList.add('flecha');
+            flechaElement.style.left = `${Math.random() * 80 + 10}%`; // Posición horizontal aleatoria
+            contenedorJuego.appendChild(flechaElement);
+
+            // Calcular la duración en milisegundos
+            const tiempoDuracion = (fin - inicio) * 1000;
+
+            // Animar la flecha desde arriba hacia abajo
+            flechaElement.animate([
+                { top: '-50px' },
+                { top: `${contenedorJuego.offsetHeight - 70}px` }  // Justo encima de la zona objetivo
+            ], {
+                duration: tiempoDuracion,
+                easing: 'linear'
+            });
+
+            setTimeout(() => {
+                puedePresionar = true;
+                flechaElement.remove();
+            }, tiempoDuracion);
         }
 
-        // Ocultar la tecla
-        function ocultarTecla() {
-            teclaElement.textContent = "-";
+        // Iniciar barra de progreso
+        function iniciarBarraProgreso() {
+            const interval = setInterval(() => {
+                const progreso = (audioCancion.currentTime / duracionCancion) * 100;
+                barraProgreso.style.width = `${progreso}%`;
+
+                if (progreso >= 100) {
+                    clearInterval(interval);
+                }
+            }, 100);
         }
 
         // Detectar cuando el usuario presiona una tecla
         document.addEventListener("keydown", function (event) {
-            if (interacciones.length > 0 && currentInteractionIndex < interacciones.length) {
-                const currentInteraction = interacciones[currentInteractionIndex];
-                const keyPressed = event.key.toLowerCase();
-                const expectedKey = String.fromCharCode(currentInteraction.tecla).toLowerCase();
+            if (interacciones.length > 0 && currentInteractionIndex < interacciones.length && puedePresionar) {
+                const currentInteraction = interacciones[currentInteractionIndex - 1];
+                const tiempoActual = audioCancion.currentTime;
+                puedePresionar = false; 
 
-                if (keyPressed === expectedKey) {
-                    feedbackElement.textContent = "Correcte!";
-                    feedbackElement.classList.add("correcte");
-                    feedbackElement.classList.remove("incorrecte");
+                if (event.keyCode === currentInteraction.tecla) {
+                    if (tiempoActual >= currentInteraction.inicio && tiempoActual <= currentInteraction.fin) {
+                        puntos++;
+                        feedbackElement.textContent = "Correcte!";
+                        feedbackElement.classList.add("correcte");
+                        feedbackElement.classList.remove("incorrecte");
+                    } else {
+                        feedbackElement.textContent = "Incorrecte!";
+                        feedbackElement.classList.add("incorrecte");
+                        feedbackElement.classList.remove("correcte");
+                    }
                 } else {
                     feedbackElement.textContent = "Incorrecte!";
                     feedbackElement.classList.add("incorrecte");
                     feedbackElement.classList.remove("correcte");
                 }
+
+                puntuacionElement.textContent = `Puntuació: ${puntos}`;
             }
         });
 
