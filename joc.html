@@ -144,7 +144,7 @@
                     interacciones = procesarInteracciones(data);
                     if (interacciones.length > 0) {
                         iniciarInteracciones();
-                        iniciarBarraProgreso();  // Iniciar la barra de progreso
+                        iniciarBarraProgreso();
                     } else {
                         feedbackElement.textContent = "No hi ha interaccions disponibles.";
                     }
@@ -194,7 +194,7 @@
             const flechas = { 37: "←", 38: "↑", 39: "→", 40: "↓" };
             flechaElement.textContent = flechas[teclaUnicode] || String.fromCharCode(teclaUnicode);
             flechaElement.classList.add('flecha');
-            flechaElement.style.left = `${Math.random() * 80 + 10}%`; // Posición horizontal aleatoria
+            flechaElement.style.left = `${Math.random() * 80 + 10}%`;
             contenedorJuego.appendChild(flechaElement);
 
             // Calcular la duración en milisegundos
@@ -203,7 +203,7 @@
             // Animar la flecha desde arriba hacia abajo
             flechaElement.animate([
                 { top: '-50px' },
-                { top: `${contenedorJuego.offsetHeight - 70}px` }  // Justo encima de la zona objetivo
+                { top: `${contenedorJuego.offsetHeight - 70}px` }                                                               
             ], {
                 duration: tiempoDuracion,
                 easing: 'linear'

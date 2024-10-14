@@ -1,11 +1,18 @@
 {
     "Canciones": [
         {
-            "titulo": "Himno del Betis",
-            "autor": "Los Chunguitos",
-            "audio": ".\/CANCIONES\/670d29774a047_tomp3.cc - Himno de Real Betis.mp3",
-            "portada": ".\/CANCIONES\/670d29774a054_hogwarts-legacy-11563.webp",
-            "archivo": ".\/CANCIONES\/670d29774a056_teclas.txt"
+            "titulo": "fdsf",
+            "autor": "4343",
+            "audio": ".\/CANCIONES\/670d37dae09f4_Himno de Espa\u00f1a.mp3",
+            "portada": ".\/CANCIONES\/670d37dae0a0e_fondo3.jpg",
+            "archivo": ".\/CANCIONES\/670d37dae0a10_teclas.txt"
+        },
+        {
+            "titulo": "fdsf",
+            "autor": "4343",
+            "audio": ".\/CANCIONES\/670d39de90f09_Himno de Espa\u00f1a.mp3",
+            "portada": ".\/CANCIONES\/670d39de90f14_hogwarts-legacy-11563.webp",
+            "archivo": ".\/CANCIONES\/670d39de90f15_teclas.txt"
         }
     ]
 }
