@@ -1,72 +1,111 @@
-// Función para obtener parámetros de la URL
-function getQueryParam(param) {
+document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
+    const titulo = urlParams.get('titulo');
+    const autor = urlParams.get('autor');
+    const audioSrc = urlParams.get('audio');
+    const archivoMovimientos = urlParams.get('archivo');
+    const portadaSrc = urlParams.get('portada');
 
-// Asignar datos de la canción a la interfaz
-const tituloCancion = getQueryParam('titulo');
-const autorCancion = getQueryParam('autor');
-const audioCancion = getQueryParam('audio');
-const portadaCancion = getQueryParam('portada');
-const archivoTeclas = getQueryParam('archivo');
+    // Mostrar información de la canción
+    document.getElementById("tituloCancion").textContent = titulo;
+    document.getElementById("autorCancion").textContent = autor;
+    document.getElementById("portadaCancion").src = portadaSrc;
 
-document.getElementById('tituloCancion').innerText = tituloCancion;
-document.getElementById('autorCancion').innerText = autorCancion;
-document.getElementById('audioCancion').src = audioCancion;
-document.getElementById('portadaCancion').src = portadaCancion;
+    // Mapeo de códigos numéricos a flechas de dirección
+    const teclaMap = {
+        '37': '⬅️', // Flecha izquierda
+        '38': '⬆️', // Flecha arriba
+        '39': '➡️', // Flecha derecha
+        '40': '⬇️'  // Flecha abajo
+    };
 
-// Variables del juego
-let puntuacion = 0;
-let teclas = [];
-let progreso = 0;
-let totalTeclas = 0;
-
-// Cargar archivo de teclas
-fetch(archivoTeclas)
-    .then(response => response.text())
-    .then(data => {
-        teclas = data.split('\n').map(linea => {
-            const [tecla, inicio, fin] = linea.split('#').map(val => val.trim());
-            return { tecla, inicio: parseFloat(inicio), fin: parseFloat(fin) };
+    let movimientos = [];
+    fetch(archivoMovimientos)
+        .then(response => response.text())
+        .then(text => {
+            // Aquí se parsea el archivo de movimientos, ignorando los tiempos
+            movimientos = text.split('\n')
+                .map(line => line.trim().split('#')[0]) // Tomar solo los códigos de teclas, ignorar tiempos
+                .filter(Boolean); // Eliminar líneas vacías
+            movimientosTotales = movimientos.length;
+            iniciarJuego();
+        })
+        .catch(error => {
+            console.error('Error al cargar el archivo de movimientos:', error);
+            alert('No se pudo cargar el archivo de movimientos.');
         });
-        totalTeclas = teclas.length;
-        iniciarJuego();
-    })
-    .catch(error => {
-        console.error('Error al cargar el archivo de teclas:', error);
-    });
 
-// Función para iniciar el juego
-function iniciarJuego() {
-    let indiceTecla = 0;
+    let indiceMovimiento = 0;
+    let puntuacion = 0;
+    let aciertos = 0;
+    let errores = 0;
+    let tiempoPorMovimiento = 0; // Tiempo de duración entre teclas
+    let tiempoTranscurrido = 0; // Tiempo transcurrido para sincronizar con la barra de progreso
 
-    // Registrar eventos de teclado
-    document.addEventListener('keydown', (event) => {
-        const teclaPresionada = event.keyCode;
-
-        if (indiceTecla < teclas.length && teclaPresionada === parseInt(teclas[indiceTecla].tecla)) {
-            puntuacion++;
-            indiceTecla++;
-            actualizarProgreso(indiceTecla);
-            document.getElementById('puntuacion').innerText = puntuacion;
-
-            if (indiceTecla === totalTeclas) {
-                finalizarJuego();
-            }
+    function iniciarJuego() {
+        if (movimientos.length === 0) {
+            alert('No hay movimientos para este juego.');
+            return;
         }
-    });
 
-    // Aquí eliminamos el renderizado de las teclas en pantalla
-}
+        tiempoPorMovimiento = 2.25 / movimientos.length; // Divide la duración total por el número de movimientos
+        mostrarMovimiento();
+        actualizarPuntuacion();
+        actualizarBarraProgreso();
+    }
 
-// Actualizar barra de progreso
-function actualizarProgreso(indiceActual) {
-    progreso = (indiceActual / totalTeclas) * 100;
-    document.getElementById('barraProgreso').value = progreso;
-}
+    function mostrarMovimiento() {
+        if (indiceMovimiento < movimientos.length) {
+            const areaJuego = document.getElementById("areaJuego");
+            const movimientoActual = movimientos[indiceMovimiento].trim();
 
-// Finalizar juego
-function finalizarJuego() {
-    alert('¡Juego completado! Puntuación: ' + puntuacion);
-}
+            // Mostrar la tecla correspondiente (flecha) según el código de tecla
+            const teclaSimbolo = teclaMap[movimientoActual] || '❓'; // '❓' si no se encuentra la tecla
+            areaJuego.textContent = teclaSimbolo;
+
+            // Esperar a que el usuario presione una tecla
+            window.addEventListener('keydown', detectarTecla);
+        } else {
+            finalizarJuego();
+        }
+    }
+
+    function detectarTecla(event) {
+        window.removeEventListener('keydown', detectarTecla);
+
+        const movimientoActual = movimientos[indiceMovimiento].trim();
+        const teclaPresionada = event.keyCode; // Capturar la tecla presionada (código numérico)
+
+        if (teclaPresionada == movimientoActual) {
+            puntuacion += 100;
+            aciertos++;
+        } else {
+            puntuacion -= 50;
+            errores++;
+        }
+
+        indiceMovimiento++;
+        actualizarPuntuacion();
+        mostrarMovimiento();
+    }
+
+    function actualizarPuntuacion() {
+        document.getElementById("puntuacion").textContent = puntuacion;
+    }
+
+    function actualizarBarraProgreso() {
+        const barraProgreso = document.getElementById("barraProgreso");
+
+        // Actualizar la barra según el número de movimientos
+        tiempoTranscurrido += tiempoPorMovimiento;
+
+        if (indiceMovimiento < movimientos.length) {
+            barraProgreso.value = (indiceMovimiento / movimientos.length) * 100;
+            setTimeout(actualizarBarraProgreso, tiempoPorMovimiento * 1000); // Actualiza la barra según el tiempo por movimiento
+        }
+    }
+
+    function finalizarJuego() {
+        alert(`Juego terminado.\nPuntuación: ${puntuacion}`);
+    }
+});

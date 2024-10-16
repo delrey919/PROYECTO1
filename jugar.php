@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
-
 <style>
     h1 {
         font-family: 'Poppins', sans-serif;
@@ -136,8 +135,9 @@
                         } else {
                             if (isset($data["Canciones"]) && !empty($data["Canciones"])) {
                                 foreach ($data["Canciones"] as $index => $cancion) {
-                                    $titulo = isset($cancion["titulo"]) ? htmlspecialchars($cancion["titulo"]) : '';
-                                    $autor = isset($cancion["autor"]) ? htmlspecialchars($cancion["autor"]) : '';
+                                    // Verificar que existan las claves antes de usarlas
+                                    $titulo = isset($cancion["titulo"]) ? htmlspecialchars($cancion["titulo"]) : 'Sin título';
+                                    $autor = isset($cancion["autor"]) ? htmlspecialchars($cancion["autor"]) : 'Autor desconocido';
                                     $portada = isset($cancion["portada"]) ? htmlspecialchars($cancion["portada"]) : '';
                                     $audio = isset($cancion["audio"]) ? htmlspecialchars($cancion["audio"]) : '';
                                     $archivo = isset($cancion["archivo"]) ? htmlspecialchars($cancion["archivo"]) : '';
@@ -152,7 +152,7 @@
                                     echo 'Tu navegador no soporta el elemento de audio.';
                                     echo '</audio>';
                                     echo '</div>';
-                                    echo '<a href="joc.html?titulo=' . urlencode($titulo) . '&autor=' . urlencode($autor) . '&audio=' . urlencode($audio) . '&archivo=' . urlencode($archivo) . '" class="jugar-btn">JUGAR</a>';
+                                    echo '<a href="joc.html?titulo=' . urlencode($titulo) . '&autor=' . urlencode($autor) . '&audio=' . urlencode($audio) . '&archivo=' . urlencode($archivo) . '&portada=' . urlencode($portada) . '" class="jugar-btn">JUGAR</a>';
                                     echo '</div>';
                                 }
                             }
