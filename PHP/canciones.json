@@ -13,6 +13,20 @@
             "audio": ".\/CANCIONES\/670fc160df4df_tomp3.cc - Himno de Real Betis.mp3",
             "portada": ".\/CANCIONES\/670fc160df4ef_hogwarts-legacy-11563.webp",
             "archivo": ".\/CANCIONES\/670fc160df4f1_unicode.txt"
+        },
+        {
+            "titulo": "fds",
+            "autor": "Los Chunguitos",
+            "audio": ".\/CANCIONES\/670fdc544bd35_tomp3.cc - Himno de Real Betis.mp3",
+            "portada": ".\/CANCIONES\/670fdc544bd3e_fondo3.jpg",
+            "archivo": ".\/CANCIONES\/670fdc544bd3f_teclas.txt"
+        },
+        {
+            "titulo": "beti",
+            "autor": "Los Chunguitos",
+            "audio": ".\/CANCIONES\/670feca213ee3_Himno de Espa\u00f1a.mp3",
+            "portada": ".\/CANCIONES\/670feca213ef4_north-beach1.jpg",
+            "archivo": ".\/CANCIONES\/670feca213efe_teclas.txt"
         }
     ]
 }

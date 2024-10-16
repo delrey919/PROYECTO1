@@ -6,19 +6,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const archivoMovimientos = urlParams.get('archivo');
     const portadaSrc = urlParams.get('portada');
 
-    // Mostrar información de la canción
     document.getElementById("tituloCancion").textContent = titulo;
     document.getElementById("autorCancion").textContent = autor;
 
     const audio = document.getElementById("audioCancion");
     audio.src = audioSrc;
 
-    // Mapeo de códigos numéricos a flechas de dirección
     const teclaMap = {
-        '37': '⬅️', // Flecha izquierda
-        '38': '⬆️', // Flecha arriba
-        '39': '➡️', // Flecha derecha
-        '40': '⬇️'  // Flecha abajo
+        '37': '⬅️',
+        '38': '⬆️',
+        '39': '➡️',
+        '40': '⬇️'
     };
 
     let movimientos = [];
@@ -29,9 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.text())
         .then(text => {
             movimientos = text.split('\n')
-                .map(line => line.trim().split('#')[0]) // Tomar solo los códigos de teclas, ignorar tiempos
-                .filter(Boolean); // Eliminar líneas vacías
-            iniciarCuentaAtras(); // Iniciar la cuenta atrás
+                .map(line => line.trim().split('#')[0])
+                .filter(Boolean);
+            iniciarCuentaAtras();
         })
         .catch(error => {
             console.error('Error al cargar el archivo de movimientos:', error);
@@ -40,25 +38,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let indiceMovimiento = 0;
     let puntuacion = 0;
-    let tiempoPorMovimiento = 1000; // Tiempo en milisegundos que cada tecla estará en pantalla
+    let tiempoPorMovimiento = 1000;
 
-    // Función para iniciar la cuenta atrás de 3, 2, 1 antes de empezar el juego
     function iniciarCuentaAtras() {
         const areaJuego = document.getElementById("areaJuego");
         let cuenta = 3;
 
         const intervaloCuentaAtras = setInterval(() => {
             if (cuenta > 0) {
-                areaJuego.textContent = cuenta; // Mostrar la cuenta atrás
+                areaJuego.textContent = cuenta;
                 cuenta--;
             } else {
                 clearInterval(intervaloCuentaAtras);
-                areaJuego.textContent = '¡Go!'; // Mostrar "¡Go!" justo antes de iniciar
+                areaJuego.textContent = '¡Go!';
                 setTimeout(() => {
-                    iniciarJuego(); // Después de medio segundo, iniciar el juego
+                    iniciarJuego();
                 }, 500);
             }
-        }, 1000); // Cambiar cada 1 segundo
+        }, 1000);
     }
 
     function iniciarJuego() {
@@ -67,40 +64,34 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        mostrarMovimiento(); // Mostrar el primer movimiento
+        mostrarMovimiento();
         actualizarPuntuacion();
         actualizarBarraProgreso();
 
-        // Detectar cuando el jugador presiona una tecla
         window.addEventListener('keydown', detectarTecla);
-
-        // Detectar si el audio se pausa
         audio.addEventListener('pause', detenerJuegoPorPausa);
     }
 
     function mostrarMovimiento() {
         if (indiceMovimiento === 0) {
-            // Retrasar la reproducción de la música por 1 segundo después de mostrar el primer movimiento
             setTimeout(() => {
                 audio.play().catch(error => {
                     console.log("Reproducción automática fallida:", error);
                 });
-            }, 1000); // Retraso de 1 segundo antes de iniciar la música
+            }, 1000);
         }
 
         if (indiceMovimiento < movimientos.length && !juegoTerminado) {
             const areaJuego = document.getElementById("areaJuego");
             const movimientoActual = movimientos[indiceMovimiento].trim();
 
-            // Mostrar la tecla correspondiente (flecha) según el código de tecla
-            const teclaSimbolo = teclaMap[movimientoActual] || '❓'; // '❓' si no se encuentra la tecla
+            const teclaSimbolo = teclaMap[movimientoActual] || '❓';
             areaJuego.textContent = teclaSimbolo;
 
-            clearTimeout(timeoutId); // Limpiar cualquier timeout anterior
-
+            clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 indiceMovimiento++;
-                mostrarMovimiento(); // Mostrar el siguiente movimiento
+                mostrarMovimiento();
             }, tiempoPorMovimiento);
         } else if (!juegoTerminado) {
             finalizarJuego();
@@ -108,19 +99,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function detectarTecla(event) {
-        const movimientoActual = movimientos[indiceMovimiento].trim(); // La tecla actual en pantalla
-        const teclaPresionada = event.keyCode.toString(); // Captura la tecla presionada en código numérico
+        const movimientoActual = movimientos[indiceMovimiento].trim();
+        const teclaPresionada = event.keyCode.toString();
 
         if (teclaPresionada === movimientoActual) {
-            puntuacion += 100; // Sumar puntos
+            puntuacion += 100;
         } else {
-            puntuacion -= 50; // Restar puntos si se equivoca
+            puntuacion -= 50;
         }
 
         actualizarPuntuacion();
-        clearTimeout(timeoutId); // Cancelar el timeout automático y avanzar manualmente
+        clearTimeout(timeoutId);
         indiceMovimiento++;
-        mostrarMovimiento(); // Mostrar el siguiente movimiento
+        mostrarMovimiento();
     }
 
     function actualizarPuntuacion() {
@@ -139,22 +130,63 @@ document.addEventListener("DOMContentLoaded", () => {
         }, tiempoPorMovimiento);
     }
 
-    // Función para detener el juego si se pausa la canción
     function detenerJuegoPorPausa() {
         if (!juegoTerminado) {
             juegoTerminado = true;
-            puntuacion = 0; // Asignar puntuación de 0
+            puntuacion = 0;
             alert('El juego ha sido pausado. Serás redirigido a la página principal.');
-            audio.pause(); // Asegurarse de que el audio esté detenido
+            audio.pause();
 
-            // Redirigir a la página principal después de la alerta
-            window.location.href = 'inicio.html'; 
+            window.location.href = 'inicio.html';
         }
     }
 
     function finalizarJuego() {
         juegoTerminado = true;
-        alert(`Juego terminado.\nPuntuación: ${puntuacion}`);
-        audio.pause(); // Pausar el audio al final del juego
+        audio.pause();
+        audio.currentTime = 0;
+        pedirNombreUsuario();
+    }
+
+    function pedirNombreUsuario() {
+        const nombreUsuario = prompt("Juego terminado.\nPuntuación: " + puntuacion + "\nIntroduce tu nombre:");
+        if (nombreUsuario) {
+            guardarEstadistica(nombreUsuario, puntuacion);
+            window.location.href = 'inicio.html'; // Redirigir al usuario a la página principal
+        } else {
+            alert("No se ha guardado la puntuación.");
+        }
+    }
+
+    function guardarEstadistica(nombre, puntuacion) {
+        const estadisticas = obtenerEstadisticas(); // Obtener estadísticas existentes
+        estadisticas.push({ nombre: nombre, puntuacion: puntuacion });
+        setCookie('estadisticas', JSON.stringify(estadisticas), 7); // Guardar la lista actualizada
+    }
+
+    function obtenerEstadisticas() {
+        const cookieValue = getCookie('estadisticas');
+        return cookieValue ? JSON.parse(cookieValue) : [];
+    }
+
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
     }
 });
