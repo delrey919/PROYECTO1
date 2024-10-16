@@ -10,14 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("tituloCancion").textContent = titulo;
     document.getElementById("autorCancion").textContent = autor;
 
-    // Cargar y reproducir automáticamente el audio
     const audio = document.getElementById("audioCancion");
     audio.src = audioSrc;
-
-    // Asegurarse de que el audio comience automáticamente
-    audio.play().catch(error => {
-        console.log("Reproducción automática fallida:", error);
-    });
 
     // Mapeo de códigos numéricos a flechas de dirección
     const teclaMap = {
@@ -37,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             movimientos = text.split('\n')
                 .map(line => line.trim().split('#')[0]) // Tomar solo los códigos de teclas, ignorar tiempos
                 .filter(Boolean); // Eliminar líneas vacías
-            iniciarJuego();
+            iniciarCuentaAtras(); // Iniciar la cuenta atrás
         })
         .catch(error => {
             console.error('Error al cargar el archivo de movimientos:', error);
@@ -48,13 +42,32 @@ document.addEventListener("DOMContentLoaded", () => {
     let puntuacion = 0;
     let tiempoPorMovimiento = 1000; // Tiempo en milisegundos que cada tecla estará en pantalla
 
+    // Función para iniciar la cuenta atrás de 3, 2, 1 antes de empezar el juego
+    function iniciarCuentaAtras() {
+        const areaJuego = document.getElementById("areaJuego");
+        let cuenta = 3;
+
+        const intervaloCuentaAtras = setInterval(() => {
+            if (cuenta > 0) {
+                areaJuego.textContent = cuenta; // Mostrar la cuenta atrás
+                cuenta--;
+            } else {
+                clearInterval(intervaloCuentaAtras);
+                areaJuego.textContent = '¡Go!'; // Mostrar "¡Go!" justo antes de iniciar
+                setTimeout(() => {
+                    iniciarJuego(); // Después de medio segundo, iniciar el juego
+                }, 500);
+            }
+        }, 1000); // Cambiar cada 1 segundo
+    }
+
     function iniciarJuego() {
         if (movimientos.length === 0 || juegoTerminado) {
             alert('No hay movimientos para este juego.');
             return;
         }
 
-        mostrarMovimiento();
+        mostrarMovimiento(); // Mostrar el primer movimiento
         actualizarPuntuacion();
         actualizarBarraProgreso();
 
@@ -66,6 +79,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function mostrarMovimiento() {
+        if (indiceMovimiento === 0) {
+            // Retrasar la reproducción de la música por 1 segundo después de mostrar el primer movimiento
+            setTimeout(() => {
+                audio.play().catch(error => {
+                    console.log("Reproducción automática fallida:", error);
+                });
+            }, 1000); // Retraso de 1 segundo antes de iniciar la música
+        }
+
         if (indiceMovimiento < movimientos.length && !juegoTerminado) {
             const areaJuego = document.getElementById("areaJuego");
             const movimientoActual = movimientos[indiceMovimiento].trim();
@@ -126,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
             audio.pause(); // Asegurarse de que el audio esté detenido
 
             // Redirigir a la página principal después de la alerta
-            window.location.href = 'inicio.html'; // Redirige a la página principal
+            window.location.href = 'inicio.html'; 
         }
     }
 
