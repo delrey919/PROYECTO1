@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ca">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
+
 <style>
     h1 {
         font-family: 'Poppins', sans-serif;
@@ -18,18 +20,29 @@
     }
 
     .carousel-item {
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
-        flex-wrap: wrap;
+        flex-direction: column;
         min-height: 400px;
-        transition: transform 0.5s ease;
+        transition: opacity 0.5s ease;
+        text-align: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    .carousel-item.active {
+        display: flex;
+        position: relative;
+        opacity: 1;
     }
 
     .carousel-item img {
         max-height: 250px;
         width: auto;
-        margin-right: 20px;
+        margin-bottom: 20px;
         border-radius: 10px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
@@ -38,7 +51,8 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        max-width: 60%;
+        align-items: center;
+        max-width: 80%;
         word-wrap: break-word;
         color: #ffcc00;
         text-align: center;
@@ -61,14 +75,6 @@
         margin-top: 15px;
         max-width: 100%;
         padding: 10px;
-    }
-
-    .carousel-item {
-        display: none;
-    }
-
-    .carousel-item.active {
-        display: flex;
     }
 
     .no-songs {
@@ -97,7 +103,17 @@
     .jugar-btn:hover {
         background-color: #ffd633;
     }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+    }
+
+    .carousel-inner {
+        position: relative;
+    }
 </style>
+
 <body>
     <div class="menu-button">
         <a href="inicio.html">TORNAR</a>
@@ -124,6 +140,7 @@
                                     $autor = isset($cancion["autor"]) ? htmlspecialchars($cancion["autor"]) : '';
                                     $portada = isset($cancion["portada"]) ? htmlspecialchars($cancion["portada"]) : '';
                                     $audio = isset($cancion["audio"]) ? htmlspecialchars($cancion["audio"]) : '';
+                                    $archivo = isset($cancion["archivo"]) ? htmlspecialchars($cancion["archivo"]) : '';
 
                                     echo '<div class="carousel-item' . ($index === 0 ? ' active' : '') . '">';
                                     echo '<img src="' . $portada . '" alt="Portada de ' . $titulo . '">';
@@ -135,14 +152,9 @@
                                     echo 'Tu navegador no soporta el elemento de audio.';
                                     echo '</audio>';
                                     echo '</div>';
+                                    echo '<a href="joc.html?titulo=' . urlencode($titulo) . '&autor=' . urlencode($autor) . '&audio=' . urlencode($audio) . '&archivo=' . urlencode($archivo) . '" class="jugar-btn">JUGAR</a>';
                                     echo '</div>';
                                 }
-                            } else {
-                                echo '<div class="carousel-item active">';
-                                echo '<div class="carousel-text">';
-                                echo '<h5>No hi ha cançons disponibles</h5>';
-                                echo '</div>';
-                                echo '</div>';
                             }
                         }
                     }
@@ -159,11 +171,10 @@
                 </button>
             </div>
         </div>
-
-        <a href="joc.html" class="jugar-btn">JUGA</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

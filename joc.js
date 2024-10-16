@@ -1,151 +1,72 @@
-async function cargarCancion() {
-    try {
-      const respuesta = await fetch('PHP/canciones.json');
-      const datos = await respuesta.json();
-      const cancion = datos.Canciones[0]; // Accedemos al primer objeto de canciones
-  
-      // Mostrar información de la canción
-      document.getElementById('tituloCancion').innerText = cancion.titulo;
-      document.getElementById('autorCancion').innerText = cancion.autor;
-      document.getElementById('portadaCancion').src = cancion.portada;
-  
-      // Cargar el archivo de texto de la canción
-      const respuestaArchivo = await fetch(cancion.archivo);
-      const texto = await respuestaArchivo.text();
-  
-      // Procesar los datos del archivo de texto
-      const movimientos = procesarArchivoTexto(texto);
-  
-      // Iniciar el juego con la duración de la canción (puedes definir manualmente la duración o extraerla del archivo)
-      iniciarJuego(movimientos, 60); // Aquí asumimos que la duración es de 60 segundos
-    } catch (error) {
-      console.error('Error al cargar la canción:', error);
-    }
-  }
-  
-  cargarCancion();
-  
-  // Procesar el archivo de texto para extraer las teclas y los tiempos
-  function procesarArchivoTexto(texto) {
-    const lineas = texto.trim().split('\n');
-    const numeroMovimientos = parseInt(lineas[0]);
-    const movimientos = [];
-  
-    for (let i = 1; i <= numeroMovimientos; i++) {
-      const [teclaUnicode, inicio, fin] = lineas[i].split('#').map(item => item.trim());
-      movimientos.push({
-        tecla: String.fromCharCode(parseInt(teclaUnicode)),
-        inicio: parseFloat(inicio),
-        fin: parseFloat(fin),
-        presionado: false,
-        mostrado: false
-      });
-    }
-  
-    return movimientos;
-  }
-  
-  // Iniciar el juego
-  function iniciarJuego(movimientos, duracionCancion) {
-    let puntuacion = 0;
-    const puntuacionMaxima = movimientos.length * 100;
-    const tiempoInicio = Date.now();
-  
-    // Actualizar la barra de progreso
-    function actualizarBarraProgreso() {
-      const tiempoActual = (Date.now() - tiempoInicio) / 1000;
-      const progreso = (tiempoActual / duracionCancion) * 100;
-      document.getElementById('barraProgreso').value = progreso;
-  
-      if (tiempoActual < duracionCancion) {
-        requestAnimationFrame(actualizarBarraProgreso);
-      }
-    }
-  
-    actualizarBarraProgreso();
-  
-    // Mostrar y ocultar teclas
-    movimientos.forEach(movimiento => {
-      setTimeout(() => {
-        mostrarTecla(movimiento.tecla);
-        movimiento.mostrado = true;
-      }, movimiento.inicio * 1000);
-  
-      setTimeout(() => {
-        ocultarTecla();
-        movimiento.mostrado = false;
-      }, movimiento.fin * 1000);
+// Función para obtener parámetros de la URL
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+// Asignar datos de la canción a la interfaz
+const tituloCancion = getQueryParam('titulo');
+const autorCancion = getQueryParam('autor');
+const audioCancion = getQueryParam('audio');
+const portadaCancion = getQueryParam('portada');
+const archivoTeclas = getQueryParam('archivo');
+
+document.getElementById('tituloCancion').innerText = tituloCancion;
+document.getElementById('autorCancion').innerText = autorCancion;
+document.getElementById('audioCancion').src = audioCancion;
+document.getElementById('portadaCancion').src = portadaCancion;
+
+// Variables del juego
+let puntuacion = 0;
+let teclas = [];
+let progreso = 0;
+let totalTeclas = 0;
+
+// Cargar archivo de teclas
+fetch(archivoTeclas)
+    .then(response => response.text())
+    .then(data => {
+        teclas = data.split('\n').map(linea => {
+            const [tecla, inicio, fin] = linea.split('#').map(val => val.trim());
+            return { tecla, inicio: parseFloat(inicio), fin: parseFloat(fin) };
+        });
+        totalTeclas = teclas.length;
+        iniciarJuego();
+    })
+    .catch(error => {
+        console.error('Error al cargar el archivo de teclas:', error);
     });
-  
-    // Escuchar pulsaciones del teclado
-    document.addEventListener('keydown', evento => {
-      const teclaPresionada = evento.key.toLowerCase();
-  
-      movimientos.forEach(movimiento => {
-        const tiempoActual = (Date.now() - tiempoInicio) / 1000;
-  
-        if (
-          movimiento.mostrado &&
-          !movimiento.presionado &&
-          tiempoActual >= movimiento.inicio &&
-          tiempoActual <= movimiento.fin
-        ) {
-          if (teclaPresionada === movimiento.tecla) {
-            movimiento.presionado = true;
-            puntuacion += 100;
-            actualizarPuntuacion(puntuacion);
-            mostrarResultado(true);
-          } else {
-            puntuacion -= 50;
-            actualizarPuntuacion(puntuacion);
-            mostrarResultado(false);
-          }
+
+// Función para iniciar el juego
+function iniciarJuego() {
+    let indiceTecla = 0;
+
+    // Registrar eventos de teclado
+    document.addEventListener('keydown', (event) => {
+        const teclaPresionada = event.keyCode;
+
+        if (indiceTecla < teclas.length && teclaPresionada === parseInt(teclas[indiceTecla].tecla)) {
+            puntuacion++;
+            indiceTecla++;
+            actualizarProgreso(indiceTecla);
+            document.getElementById('puntuacion').innerText = puntuacion;
+
+            if (indiceTecla === totalTeclas) {
+                finalizarJuego();
+            }
         }
-      });
     });
-  
-    // Finalizar el juego después de la duración de la canción
-    setTimeout(() => {
-      finalizarJuego(puntuacion, puntuacionMaxima);
-    }, duracionCancion * 1000);
-  }
-  
-  function mostrarTecla(tecla) {
-    const areaJuego = document.getElementById('areaJuego');
-    areaJuego.innerText = tecla;
-  }
-  
-  function ocultarTecla() {
-    const areaJuego = document.getElementById('areaJuego');
-    areaJuego.innerText = '';
-  }
-  
-  function mostrarResultado(acierto) {
-    const areaJuego = document.getElementById('areaJuego');
-    if (acierto) {
-      areaJuego.classList.add('acierto');
-      areaJuego.classList.remove('error');
-    } else {
-      areaJuego.classList.add('error');
-      areaJuego.classList.remove('acierto');
-    }
-  }
-  
-  function actualizarPuntuacion(puntuacion) {
-    document.getElementById('puntuacion').innerText = puntuacion;
-  }
-  
-  function finalizarJuego(puntuacion, puntuacionMaxima) {
-    const porcentajeAciertos = (puntuacion / puntuacionMaxima) * 100;
-    let rango;
-  
-    if (porcentajeAciertos >= 90) rango = 'A';
-    else if (porcentajeAciertos >= 70) rango = 'B';
-    else if (porcentajeAciertos >= 50) rango = 'C';
-    else if (porcentajeAciertos >= 25) rango = 'D';
-    else rango = 'E';
-  
-    const nombre = prompt('La canción ha terminado.\n\nIntroduce tu nombre:');
-    alert(`Nombre: ${nombre}\nPuntuación: ${puntuacion}\nRango: ${rango}`);
-  }
-  
+
+    // Aquí eliminamos el renderizado de las teclas en pantalla
+}
+
+// Actualizar barra de progreso
+function actualizarProgreso(indiceActual) {
+    progreso = (indiceActual / totalTeclas) * 100;
+    document.getElementById('barraProgreso').value = progreso;
+}
+
+// Finalizar juego
+function finalizarJuego() {
+    alert('¡Juego completado! Puntuación: ' + puntuacion);
+}
