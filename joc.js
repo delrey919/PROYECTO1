@@ -9,7 +9,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mostrar información de la canción
     document.getElementById("tituloCancion").textContent = titulo;
     document.getElementById("autorCancion").textContent = autor;
-    document.getElementById("portadaCancion").src = portadaSrc;
+
+    // Cargar y reproducir automáticamente el audio
+    const audio = document.getElementById("audioCancion");
+    audio.src = audioSrc;
+
+    // Asegurarse de que el audio comience automáticamente
+    audio.play().catch(error => {
+        console.log("Reproducción automática fallida:", error);
+    });
 
     // Mapeo de códigos numéricos a flechas de dirección
     const teclaMap = {
@@ -20,14 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     let movimientos = [];
+    let juegoTerminado = false;
+    let timeoutId;
+
     fetch(archivoMovimientos)
         .then(response => response.text())
         .then(text => {
-            // Aquí se parsea el archivo de movimientos, ignorando los tiempos
             movimientos = text.split('\n')
                 .map(line => line.trim().split('#')[0]) // Tomar solo los códigos de teclas, ignorar tiempos
                 .filter(Boolean); // Eliminar líneas vacías
-            movimientosTotales = movimientos.length;
             iniciarJuego();
         })
         .catch(error => {
@@ -37,25 +46,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let indiceMovimiento = 0;
     let puntuacion = 0;
-    let aciertos = 0;
-    let errores = 0;
-    let tiempoPorMovimiento = 0; // Tiempo de duración entre teclas
-    let tiempoTranscurrido = 0; // Tiempo transcurrido para sincronizar con la barra de progreso
+    let tiempoPorMovimiento = 1000; // Tiempo en milisegundos que cada tecla estará en pantalla
 
     function iniciarJuego() {
-        if (movimientos.length === 0) {
+        if (movimientos.length === 0 || juegoTerminado) {
             alert('No hay movimientos para este juego.');
             return;
         }
 
-        tiempoPorMovimiento = 2.25 / movimientos.length; // Divide la duración total por el número de movimientos
         mostrarMovimiento();
         actualizarPuntuacion();
         actualizarBarraProgreso();
+
+        // Detectar cuando el jugador presiona una tecla
+        window.addEventListener('keydown', detectarTecla);
+
+        // Detectar si el audio se pausa
+        audio.addEventListener('pause', detenerJuegoPorPausa);
     }
 
     function mostrarMovimiento() {
-        if (indiceMovimiento < movimientos.length) {
+        if (indiceMovimiento < movimientos.length && !juegoTerminado) {
             const areaJuego = document.getElementById("areaJuego");
             const movimientoActual = movimientos[indiceMovimiento].trim();
 
@@ -63,30 +74,31 @@ document.addEventListener("DOMContentLoaded", () => {
             const teclaSimbolo = teclaMap[movimientoActual] || '❓'; // '❓' si no se encuentra la tecla
             areaJuego.textContent = teclaSimbolo;
 
-            // Esperar a que el usuario presione una tecla
-            window.addEventListener('keydown', detectarTecla);
-        } else {
+            clearTimeout(timeoutId); // Limpiar cualquier timeout anterior
+
+            timeoutId = setTimeout(() => {
+                indiceMovimiento++;
+                mostrarMovimiento(); // Mostrar el siguiente movimiento
+            }, tiempoPorMovimiento);
+        } else if (!juegoTerminado) {
             finalizarJuego();
         }
     }
 
     function detectarTecla(event) {
-        window.removeEventListener('keydown', detectarTecla);
+        const movimientoActual = movimientos[indiceMovimiento].trim(); // La tecla actual en pantalla
+        const teclaPresionada = event.keyCode.toString(); // Captura la tecla presionada en código numérico
 
-        const movimientoActual = movimientos[indiceMovimiento].trim();
-        const teclaPresionada = event.keyCode; // Capturar la tecla presionada (código numérico)
-
-        if (teclaPresionada == movimientoActual) {
-            puntuacion += 100;
-            aciertos++;
+        if (teclaPresionada === movimientoActual) {
+            puntuacion += 100; // Sumar puntos
         } else {
-            puntuacion -= 50;
-            errores++;
+            puntuacion -= 50; // Restar puntos si se equivoca
         }
 
-        indiceMovimiento++;
         actualizarPuntuacion();
-        mostrarMovimiento();
+        clearTimeout(timeoutId); // Cancelar el timeout automático y avanzar manualmente
+        indiceMovimiento++;
+        mostrarMovimiento(); // Mostrar el siguiente movimiento
     }
 
     function actualizarPuntuacion() {
@@ -95,17 +107,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function actualizarBarraProgreso() {
         const barraProgreso = document.getElementById("barraProgreso");
+        const progresoInterval = setInterval(() => {
+            const progreso = (indiceMovimiento / movimientos.length) * 100;
+            barraProgreso.value = progreso;
 
-        // Actualizar la barra según el número de movimientos
-        tiempoTranscurrido += tiempoPorMovimiento;
+            if (indiceMovimiento >= movimientos.length || juegoTerminado) {
+                clearInterval(progresoInterval);
+            }
+        }, tiempoPorMovimiento);
+    }
 
-        if (indiceMovimiento < movimientos.length) {
-            barraProgreso.value = (indiceMovimiento / movimientos.length) * 100;
-            setTimeout(actualizarBarraProgreso, tiempoPorMovimiento * 1000); // Actualiza la barra según el tiempo por movimiento
+    // Función para detener el juego si se pausa la canción
+    function detenerJuegoPorPausa() {
+        if (!juegoTerminado) {
+            juegoTerminado = true;
+            puntuacion = 0; // Asignar puntuación de 0
+            alert('El juego ha sido pausado. Serás redirigido a la página principal.');
+            audio.pause(); // Asegurarse de que el audio esté detenido
+
+            // Redirigir a la página principal después de la alerta
+            window.location.href = 'inicio.html'; // Redirige a la página principal
         }
     }
 
     function finalizarJuego() {
+        juegoTerminado = true;
         alert(`Juego terminado.\nPuntuación: ${puntuacion}`);
+        audio.pause(); // Pausar el audio al final del juego
     }
 });
