@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let movimientos = [];
     let juegoTerminado = false;
+    let movimientosCorrectos = 0; // Contador de movimientos correctos
+    let totalMovimientos = 0; // Total de movimientos a realizar
 
     fetch(archivoMovimientos)
         .then(response => response.text())
@@ -34,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     tiempoFin: parseFloat(line[2].trim()),
                     evaluado: false // Estado adicional para saber si ya fue evaluado
                 }));
+            totalMovimientos = movimientos.length; // Guardar el total de movimientos
             iniciarCuentaAtras();
         })
         .catch(error => {
@@ -95,7 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
     function ocultarMovimiento(movimiento) {
         const areaJuego = document.getElementById("areaJuego");
         areaJuego.textContent = '';
-        movimiento.evaluado = true; // Marcar como evaluado cuando desaparezca
+
+        if (!movimiento.evaluado) {
+            puntuacion -= 50;
+            actualizarPuntuacion();
+        }
+
+        movimiento.evaluado = true; 
     }
 
     function detectarTecla(event) {
@@ -108,13 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (teclaPresionada === movimientoActual.tecla) {
                 puntuacion += 100;
+                movimientosCorrectos++; 
             } else {
                 puntuacion -= 50;
             }
 
-            movimientoActual.evaluado = true; // Marcar el movimiento como evaluado después de la primera pulsación
+            movimientoActual.evaluado = true;
             actualizarPuntuacion();
-            // Ocultar movimiento inmediatamente después de presionar la tecla
             ocultarMovimiento(movimientoActual);
         }
     }
@@ -144,22 +153,38 @@ document.addEventListener("DOMContentLoaded", () => {
         juegoTerminado = true;
         audio.pause();
         audio.currentTime = 0;
-        pedirNombreUsuario();
+        mostrarRango(); // Mostrar el rango al final del juego
     }
 
-    function pedirNombreUsuario() {
-        const nombreUsuario = prompt("Juego terminado.\nPuntuación: " + puntuacion + "\nIntroduce tu nombre:");
+    function mostrarRango() {
+        const porcentajeAciertos = (movimientosCorrectos / totalMovimientos) * 100;
+        let rango;
+
+        if (porcentajeAciertos >= 90) {
+            rango = "A";
+        } else if (porcentajeAciertos >= 70) {
+            rango = "B";
+        } else if (porcentajeAciertos >= 50) {
+            rango = "C";
+        } else if (porcentajeAciertos >= 25) {
+            rango = "D";
+        } else {
+            rango = "E";
+        }
+
+        const nombreUsuario = prompt(`Juego terminado.\nPuntuación: ${puntuacion}\nPorcentaje de aciertos: ${porcentajeAciertos.toFixed(2)}%\nRango: ${rango}\nIntroduce tu nombre:`);
+        
         if (nombreUsuario) {
-            guardarEstadistica(nombreUsuario, puntuacion);
-            window.location.href = 'inicio.html'; // Redirigir al usuario a la página principal
+            guardarEstadistica(nombreUsuario, puntuacion, rango);
+            window.location.href = 'inicio.html';
         } else {
             alert("No se ha guardado la puntuación.");
         }
     }
 
-    function guardarEstadistica(nombre, puntuacion) {
+    function guardarEstadistica(nombre, puntuacion, rango) {
         const estadisticas = obtenerEstadisticas(); // Obtener estadísticas existentes
-        estadisticas.push({ nombre, puntuacion });
+        estadisticas.push({ nombre, puntuacion, rango });
         setCookie('estadisticas', JSON.stringify(estadisticas), 7); // Guardar la lista actualizada
     }
 
