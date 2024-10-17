@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas</title>
+    <title>ESTADÍSTIQUES</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -33,36 +35,34 @@
             margin-bottom: 20px;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        li {
+        th, td {
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        th {
+            background-color: #ffcc00;
+            color: #282c34;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        td {
             background-color: #1c1c1e;
-            margin-bottom: 10px;
-            padding: 10px 15px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.3s ease;
+            border-bottom: 1px solid #444;
         }
 
-        li:hover {
-            transform: translateY(-5px);
+        tr:hover td {
             background-color: #ffcc00;
             color: black;
-        }
-
-        .username {
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .score {
-            font-size: 1.2rem;
+            transform: translateY(-3px);
+            transition: all 0.3s ease;
         }
 
         a.button {
@@ -84,26 +84,41 @@
 </head>
 <body>
     <div class="container">
-        <h1>Estadísticas</h1>
-        <ul>
-            <?php
-            // Obtener la cookie 'estadisticas'
-            if (isset($_COOKIE['estadisticas'])) {
-                $estadisticas = json_decode($_COOKIE['estadisticas'], true);
-                if (!empty($estadisticas)) {
-                    foreach ($estadisticas as $entry) {
-                        $nombre = htmlspecialchars($entry['nombre']);
-                        $puntuacion = htmlspecialchars($entry['puntuacion']);
-                        echo "<li><span class='username'>$nombre</span> <span class='score'>--> $puntuacion</span></li>";
+        <h1>ESTADÍSTIQUES</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Jugador</th>
+                    <th>Puntuació</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Obtener la cookie 'estadisticas'
+                if (isset($_COOKIE['estadisticas'])) {
+                    $estadisticas = json_decode($_COOKIE['estadisticas'], true);
+
+                    // Ordenar las estadísticas por puntuación en orden descendente
+                    usort($estadisticas, function($a, $b) {
+                        return $b['puntuacion'] - $a['puntuacion'];
+                    });
+
+                    // Verificar si hay datos
+                    if (!empty($estadisticas)) {
+                        foreach ($estadisticas as $entry) {
+                            $nombre = htmlspecialchars($entry['nombre']);
+                            $puntuacion = htmlspecialchars($entry['puntuacion']);
+                            echo "<tr><td>$nombre</td><td>$puntuacion</td></tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='2'>No hay estadísticas disponibles.</td></tr>";
                     }
                 } else {
-                    echo "<li>No hay estadísticas disponibles.</li>";
+                    echo "<tr><td colspan='2'>No se encontraron estadísticas guardadas.</td></tr>";
                 }
-            } else {
-                echo "<li>No se encontraron estadísticas guardadas.</li>";
-            }
-            ?>
-        </ul>
+                ?>
+            </tbody>
+        </table>
         <a href="inicio.html" class="button">Tornar</a>
     </div>
 </body>

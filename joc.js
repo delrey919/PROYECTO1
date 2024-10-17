@@ -21,14 +21,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let movimientos = [];
     let juegoTerminado = false;
-    let timeoutId;
 
     fetch(archivoMovimientos)
         .then(response => response.text())
         .then(text => {
             movimientos = text.split('\n')
-                .map(line => line.trim().split('#')[0])
-                .filter(Boolean);
+                .map(line => line.trim().split('#'))
+                .filter(line => line.length === 3)
+                .map(line => ({
+                    tecla: line[0].trim(),
+                    tiempoInicio: parseFloat(line[1].trim()),
+                    tiempoFin: parseFloat(line[2].trim()),
+                    evaluado: false // Estado adicional para saber si ya fue evaluado
+                }));
             iniciarCuentaAtras();
         })
         .catch(error => {
@@ -36,9 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert('No se pudo cargar el archivo de movimientos.');
         });
 
-    let indiceMovimiento = 0;
     let puntuacion = 0;
-    let tiempoPorMovimiento = 1000;
 
     function iniciarCuentaAtras() {
         const areaJuego = document.getElementById("areaJuego");
@@ -64,70 +67,66 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        mostrarMovimiento();
-        actualizarPuntuacion();
-        actualizarBarraProgreso();
-
         window.addEventListener('keydown', detectarTecla);
         audio.addEventListener('pause', detenerJuegoPorPausa);
+        audio.play().catch(error => console.log("Reproducción automática fallida:", error));
+
+        // Mostrar y ocultar movimientos en los tiempos indicados
+        movimientos.forEach((movimiento, index) => {
+            setTimeout(() => {
+                mostrarMovimiento(movimiento);
+                actualizarBarraProgreso(index + 1); // Actualizar progreso cada vez que aparece un movimiento
+            }, movimiento.tiempoInicio * 1000);
+
+            setTimeout(() => ocultarMovimiento(movimiento), movimiento.tiempoFin * 1000);
+        });
+
+        // Finalizar el juego cuando el último movimiento haya desaparecido
+        const ultimoTiempoFin = Math.max(...movimientos.map(m => m.tiempoFin)) * 1000;
+        setTimeout(finalizarJuego, ultimoTiempoFin + 500);
     }
 
-    function mostrarMovimiento() {
-        if (indiceMovimiento === 0) {
-            setTimeout(() => {
-                audio.play().catch(error => {
-                    console.log("Reproducción automática fallida:", error);
-                });
-            }, 1000);
-        }
+    function mostrarMovimiento(movimiento) {
+        const areaJuego = document.getElementById("areaJuego");
+        const teclaSimbolo = teclaMap[movimiento.tecla] || '❓';
+        areaJuego.textContent = teclaSimbolo;
+    }
 
-        if (indiceMovimiento < movimientos.length && !juegoTerminado) {
-            const areaJuego = document.getElementById("areaJuego");
-            const movimientoActual = movimientos[indiceMovimiento].trim();
-
-            const teclaSimbolo = teclaMap[movimientoActual] || '❓';
-            areaJuego.textContent = teclaSimbolo;
-
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                indiceMovimiento++;
-                mostrarMovimiento();
-            }, tiempoPorMovimiento);
-        } else if (!juegoTerminado) {
-            finalizarJuego();
-        }
+    function ocultarMovimiento(movimiento) {
+        const areaJuego = document.getElementById("areaJuego");
+        areaJuego.textContent = '';
+        movimiento.evaluado = true; // Marcar como evaluado cuando desaparezca
     }
 
     function detectarTecla(event) {
-        const movimientoActual = movimientos[indiceMovimiento].trim();
-        const teclaPresionada = event.keyCode.toString();
+        const movimientoActual = movimientos.find(movimiento => 
+            audio.currentTime >= movimiento.tiempoInicio && audio.currentTime <= movimiento.tiempoFin && !movimiento.evaluado
+        );
 
-        if (teclaPresionada === movimientoActual) {
-            puntuacion += 100;
-        } else {
-            puntuacion -= 50;
+        if (movimientoActual) {
+            const teclaPresionada = event.keyCode.toString();
+            
+            if (teclaPresionada === movimientoActual.tecla) {
+                puntuacion += 100;
+            } else {
+                puntuacion -= 50;
+            }
+
+            movimientoActual.evaluado = true; // Marcar el movimiento como evaluado después de la primera pulsación
+            actualizarPuntuacion();
+            // Ocultar movimiento inmediatamente después de presionar la tecla
+            ocultarMovimiento(movimientoActual);
         }
-
-        actualizarPuntuacion();
-        clearTimeout(timeoutId);
-        indiceMovimiento++;
-        mostrarMovimiento();
     }
 
     function actualizarPuntuacion() {
         document.getElementById("puntuacion").textContent = puntuacion;
     }
 
-    function actualizarBarraProgreso() {
+    function actualizarBarraProgreso(movimientosCompletados) {
         const barraProgreso = document.getElementById("barraProgreso");
-        const progresoInterval = setInterval(() => {
-            const progreso = (indiceMovimiento / movimientos.length) * 100;
-            barraProgreso.value = progreso;
-
-            if (indiceMovimiento >= movimientos.length || juegoTerminado) {
-                clearInterval(progresoInterval);
-            }
-        }, tiempoPorMovimiento);
+        const progreso = (movimientosCompletados / movimientos.length) * 100;
+        barraProgreso.value = progreso;
     }
 
     function detenerJuegoPorPausa() {
@@ -160,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function guardarEstadistica(nombre, puntuacion) {
         const estadisticas = obtenerEstadisticas(); // Obtener estadísticas existentes
-        estadisticas.push({ nombre: nombre, puntuacion: puntuacion });
+        estadisticas.push({ nombre, puntuacion });
         setCookie('estadisticas', JSON.stringify(estadisticas), 7); // Guardar la lista actualizada
     }
 

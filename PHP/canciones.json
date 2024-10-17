@@ -27,6 +27,13 @@
             "audio": ".\/CANCIONES\/670feca213ee3_Himno de Espa\u00f1a.mp3",
             "portada": ".\/CANCIONES\/670feca213ef4_north-beach1.jpg",
             "archivo": ".\/CANCIONES\/670feca213efe_teclas.txt"
+        },
+        {
+            "titulo": "434",
+            "autor": "4343",
+            "audio": ".\/CANCIONES\/670fed1f53c9d_Himno de Espa\u00f1a.mp3",
+            "portada": ".\/CANCIONES\/670fed1f53cb2_north-beach1.jpg",
+            "archivo": ".\/CANCIONES\/670fed1f53cbb_teclas.txt"
         }
     ]
 }
