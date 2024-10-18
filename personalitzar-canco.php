@@ -6,77 +6,11 @@
     <title>Modificar cançó</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .song-item {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-        }
 
-        .song-item img {
-            max-width: 100px;
-            margin-right: 15px;
-            border-radius: 10px;
-        }
-
-        .song-details {
-            flex-grow: 1;
-        }
-
-        .modify-button {
-            background-color: #4d8fff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-left: auto;
-        }
-
-        .modify-button:hover {
-            background-color: #007bff;
-        }
-
-        .song-details {
-            flex-grow: 1;
-            min-width: 300px;
-        }
-
-        .song-details h5 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 0;
-            color: #ffda44;
-        }
-
-        .song-details p {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 400;
-            margin: 5px 0 0;
-            color: #ffffff;
-        }
-
-        .song-item { 
-            padding: 15px;
-            border-radius: 10px;
-            transition: transform 0.3s ease;
-        }
-
-        .song-item:hover {
-            transform: scale(1.05); 
-        }
-
-        .form-container {
-            display: none;
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
     <div class="menu-button">
-        <a href="inicio.html">TORNAR</a>
+        <a href="index.html">TORNAR</a>
     </div>
 
     <div class="container">

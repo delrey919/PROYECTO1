@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
-<style>
-    h1 {
+
+<body>
+    <style>
+  h1 {
         font-family: 'Poppins', sans-serif;
         font-weight: 700;
         color: #ffcc00;
@@ -111,11 +113,9 @@
     .carousel-inner {
         position: relative;
     }
-</style>
-
-<body>
+    </style>
     <div class="menu-button">
-        <a href="inicio.html">TORNAR</a>
+        <a href="index.html">TORNAR</a>
     </div>
     <div class="container">
         <div class="title">

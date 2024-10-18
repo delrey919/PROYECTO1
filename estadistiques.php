@@ -6,81 +6,6 @@
     <title>ESTADÍSTIQUES</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #282c34;
-            color: #ecf0f1;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-
-        .container {
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            width: 80%;
-            max-width: 600px;
-        }
-
-        h1 {
-            color: #ffcc00;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2rem;
-        }
-
-        th {
-            background-color: #ffcc00;
-            color: #282c34;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        td {
-            background-color: #1c1c1e;
-            border-bottom: 1px solid #444;
-        }
-
-        tr:hover td {
-            background-color: #ffcc00;
-            color: black;
-            transform: translateY(-3px);
-            transition: all 0.3s ease;
-        }
-
-        a.button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #ffcc00;
-            color: #282c34;
-            font-weight: bold;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        a.button:hover {
-            background-color: #ffd633;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -119,7 +44,7 @@
                 ?>
             </tbody>
         </table>
-        <a href="inicio.html" class="button">Tornar</a>
+        <a href="index.html" class="button">Tornar</a>
     </div>
 </body>
 </html>

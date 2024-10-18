@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert('El juego ha sido pausado. Serás redirigido a la página principal.');
             audio.pause();
 
-            window.location.href = 'inicio.html';
+            window.location.href = 'index.html';
         }
     }
 
@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (nombreUsuario) {
             guardarEstadistica(nombreUsuario, puntuacion, rango);
-            window.location.href = 'inicio.html';
+            window.location.href = 'index.html';
         } else {
             alert("No se ha guardado la puntuación.");
         }
