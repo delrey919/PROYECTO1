@@ -1,13 +1,6 @@
 {
     "Canciones": [
         {
-            "titulo": "434",
-            "autor": "4343",
-            "audio": ".\/CANCIONES\/67111f7e67eb0_tomp3.cc - Himno de Real Betis.mp3",
-            "portada": ".\/CANCIONES\/67111f7e67eb6_north-beach1.jpg",
-            "archivo": ".\/CANCIONES\/67111f7e67eb7_teclas.txt"
-        },
-        {
             "titulo": "Los Chunguitos",
             "autor": "Los Chunguitos",
             "audio": ".\/CANCIONES\/6711240f18aa2_tomp3.cc - Himno de Real Betis.mp3",
@@ -15,11 +8,11 @@
             "archivo": ".\/CANCIONES\/6711240f18aaa_teclas.txt"
         },
         {
-            "titulo": "Himno del Betis",
-            "autor": "Los Chunguitos",
-            "audio": ".\/CANCIONES\/6712799e21b9b_Himno de Espa\u00f1a.mp3",
-            "portada": ".\/CANCIONES\/6712799e21cd3_hogwarts-legacy-11563.webp",
-            "archivo": ".\/CANCIONES\/6712799e21e5a_teclas.txt"
+            "titulo": "can\u00e7o 2",
+            "autor": "denis",
+            "audio": ".\/CANCIONES\/6718fa3dad959_tomp3.cc - Himno de Real Betis.mp3",
+            "portada": ".\/CANCIONES\/6718fa3dadc49_671532c223c02_nazare-portugal-europe (1).jpg",
+            "archivo": ".\/CANCIONES\/6718fa3daddec_teclas.txt"
         }
     ]
 }
